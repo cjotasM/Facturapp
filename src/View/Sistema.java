@@ -486,7 +486,7 @@ public class Sistema extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "CC", "NONMBRE", "TELEFONO", "DIRECCION", "RAZON SOCIAL"
+                "ID", "CC", "NOMBRE", "TELEFONO", "DIRECCION", "RAZON SOCIAL"
             }
         ));
         tableCliente.addMouseListener(new java.awt.event.MouseAdapter() {
