@@ -709,7 +709,7 @@
                       <Table columnCount="6" rowCount="0">
                         <Column editable="true" title="ID" type="java.lang.Object"/>
                         <Column editable="true" title="CC" type="java.lang.Object"/>
-                        <Column editable="true" title="NONMBRE" type="java.lang.Object"/>
+                        <Column editable="true" title="NOMBRE" type="java.lang.Object"/>
                         <Column editable="true" title="TELEFONO" type="java.lang.Object"/>
                         <Column editable="true" title="DIRECCION" type="java.lang.Object"/>
                         <Column editable="true" title="RAZON SOCIAL" type="java.lang.Object"/>
@@ -1321,9 +1321,6 @@
                   <Color id="Hand Cursor"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNuevoProductActionPerformed"/>
-              </Events>
             </Component>
             <Container class="javax.swing.JScrollPane" name="jScrollPane4">
               <AuxValues>

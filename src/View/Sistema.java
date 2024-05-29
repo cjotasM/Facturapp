@@ -7,13 +7,10 @@ package View;
 import Model.Cliente;
 import Model.ClienteDAO;
 import Model.Productos;
-
 import Model.ProductosDAO;
 import Model.Proveedor;
 import Model.ProveedorDAO;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -493,7 +490,7 @@ public class Sistema extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "CC", "NONMBRE", "TELEFONO", "DIRECCION", "RAZON SOCIAL"
+                "ID", "CC", "NOMBRE", "TELEFONO", "DIRECCION", "RAZON SOCIAL"
             }
         ));
         tableCliente.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -826,11 +823,6 @@ public class Sistema extends javax.swing.JFrame {
 
         btnNuevoProduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/nuevo.png"))); // NOI18N
         btnNuevoProduct.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnNuevoProduct.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNuevoProductActionPerformed(evt);
-            }
-        });
 
         tableProduct.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1227,7 +1219,6 @@ public class Sistema extends javax.swing.JFrame {
                 || !"".equals(txtRazonProveedor.getText())) {
             pr.setNit(Integer.parseInt(txtNitProveedor.getText()));
             pr.setNombre(txtNombreProveedor.getText());
-            pr.setId(Integer.parseInt(txtIdProveedor.getText()));
             pr.setTelefono(Long.parseLong(txtTelefonoProveedor.getText()));
             pr.setDireccion(txtDireccionProveedor.getText());
             pr.setRazon(txtRazonProveedor.getText());
@@ -1284,34 +1275,38 @@ public class Sistema extends javax.swing.JFrame {
     private void btnEditarProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarProveedorActionPerformed
         // TODO add your handling code here:
         if ("".equals(txtIdProveedor.getText())) {
-            
             JOptionPane.showMessageDialog(null, "Seleccione una fila");
-        }else {
-            if ("".equals(txtNitProveedor.getText()) && !"".equals(txtNombreProveedor.getText()) && !"".equals(txtTelefonoProveedor.getText()) && !"".equals(txtDireccionProveedor.getText()) && !"".equals(txtRazonProveedor.getText())  ) {
+        } else {
+
+            if (!"".equals(txtNitProveedor.getText()) && !"".equals(txtNombreProveedor.getText())
+                    && !"".equals(txtTelefonoProveedor.getText()) && !"".equals(txtDireccionProveedor.getText())) {
                 pr.setNit(Integer.parseInt(txtNitProveedor.getText()));
                 pr.setNombre(txtNombreProveedor.getText());
                 pr.setTelefono(Long.parseLong(txtTelefonoProveedor.getText()));
                 pr.setDireccion(txtDireccionProveedor.getText());
                 pr.setRazon(txtRazonProveedor.getText());
                 pr.setId(Integer.parseInt(txtIdProveedor.getText()));
-                prDAO.ModificarProveedor(pr);
-                limpiarTable();
-                limpiarProveedor();
-                listarProveedor();
+                if (prDAO.ModificarProveedor(pr)) {
+                    limpiarTable();
+                    limpiarProveedor();
+                    listarProveedor();
+                    
+                    JOptionPane.showMessageDialog(null, "Proveedor editado");
+                }else {
+                    JOptionPane.showMessageDialog(null, "Error al editar el proveedor");
+                }
+                
+                
+            } else {
+                JOptionPane.showMessageDialog(null, "Faltan Datos");
             }
-    
         }
-        
     }//GEN-LAST:event_btnEditarProveedorActionPerformed
-
-    private void btnNuevoProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoProductActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnNuevoProductActionPerformed
 
     private void btnGuardarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarProductoActionPerformed
         // TODO add your handling code here:
         
-        if (!!"".equals(txtCodigoProduct.getText()) &&  !!"".equals(txtDescProduct.getText()) &&  !!"".equals(txtCantidadProduct.getText()) && !!"".equals(cbxProveedorProduct.getSelectedItem()) && !!"".equals(txtPrecioProduct.getText()) ) {
+        if (!"".equals(txtCodigoProduct.getText()) &&  !"".equals(txtDescProduct.getText()) &&  !"".equals(txtCantidadProduct.getText()) && !"".equals(cbxProveedorProduct.getSelectedItem()) && !"".equals(txtPrecioProduct.getText()) ) {
             
             pro.setCodigo(txtCodigoProduct.getText());
             pro.setNombre(txtDescProduct.getText());
