@@ -13,6 +13,7 @@ import Model.ProveedorDAO;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 /**
  *
@@ -32,6 +33,8 @@ public class Sistema extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         txtIdCliente.setVisible(false);
+        AutoCompleteDecorator.decorate(cbxProveedorProduct);
+        proDAO.ConsultarProveedor(cbxProveedorProduct);
     }
 
     public void listarCliente() {
@@ -68,6 +71,23 @@ public class Sistema extends javax.swing.JFrame {
             modelo.addRow(ob);
         }
         tableProveedor.setModel(modelo);
+    }
+    
+    public void listarProductos() {
+        List<Productos> listarPro = proDAO.listarProductos();
+        modelo = (DefaultTableModel) tableProduct.getModel();
+        Object[] ob = new Object[6];
+
+        for (int i = 0; i < listarPro.size(); i++) {
+            ob[0] = listarPro.get(i).getId();
+            ob[1] = listarPro.get(i).getCodigo();
+            ob[2] = listarPro.get(i).getNombre();
+            ob[3] = listarPro.get(i).getProveedor();
+            ob[4] = listarPro.get(i).getStock();
+            ob[5] = listarPro.get(i).getPrecio();
+            modelo.addRow(ob);
+        }
+        tableProduct.setModel(modelo);
     }
 
     public void limpiarTable() {
@@ -224,6 +244,11 @@ public class Sistema extends javax.swing.JFrame {
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/producto.png"))); // NOI18N
         jButton4.setText("Productos");
         jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/compras.png"))); // NOI18N
         jButton5.setText("Ventas");
@@ -817,31 +842,57 @@ public class Sistema extends javax.swing.JFrame {
 
         btnEditarProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/Actualizar (2).png"))); // NOI18N
         btnEditarProducto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditarProducto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarProductoActionPerformed(evt);
+            }
+        });
 
         btnEliminarproduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/eliminar.png"))); // NOI18N
         btnEliminarproduct.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEliminarproduct.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarproductActionPerformed(evt);
+            }
+        });
 
         btnNuevoProduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/nuevo.png"))); // NOI18N
         btnNuevoProduct.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnNuevoProduct.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoProductActionPerformed(evt);
+            }
+        });
 
         tableProduct.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "CÓDIGO", "DESCRIPCION", "STOCK", "PRECIO", "PROVEEDOR"
+                "ID", "CÓDIGO", "DESCRIPCION", "STOCK", "PRECIO", "PROVEEDOR"
             }
         ));
+        tableProduct.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableProductMouseClicked(evt);
+            }
+        });
         jScrollPane4.setViewportView(tableProduct);
         if (tableProduct.getColumnModel().getColumnCount() > 0) {
-            tableProduct.getColumnModel().getColumn(0).setPreferredWidth(50);
-            tableProduct.getColumnModel().getColumn(1).setPreferredWidth(100);
-            tableProduct.getColumnModel().getColumn(2).setPreferredWidth(40);
-            tableProduct.getColumnModel().getColumn(3).setPreferredWidth(50);
-            tableProduct.getColumnModel().getColumn(4).setPreferredWidth(60);
+            tableProduct.getColumnModel().getColumn(0).setPreferredWidth(20);
+            tableProduct.getColumnModel().getColumn(1).setPreferredWidth(50);
+            tableProduct.getColumnModel().getColumn(2).setPreferredWidth(100);
+            tableProduct.getColumnModel().getColumn(3).setPreferredWidth(40);
+            tableProduct.getColumnModel().getColumn(4).setPreferredWidth(50);
+            tableProduct.getColumnModel().getColumn(5).setPreferredWidth(60);
         }
 
         cbxProveedorProduct.setEditable(true);
+        cbxProveedorProduct.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxProveedorProductActionPerformed(evt);
+            }
+        });
 
         btnExcelProduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/excel.png"))); // NOI18N
         btnExcelProduct.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -1321,6 +1372,65 @@ public class Sistema extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnGuardarProductoActionPerformed
 
+    private void btnEditarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarProductoActionPerformed
+        if ("".equals(txtIdPro.getText())) {
+            
+            JOptionPane.showMessageDialog(null, "Seleccione una fila");
+        }else {
+            if (!"".equals(txtCodigoProduct.getText()) && !"".equals(txtDescProduct.getText()) && !"".equals(txtCantidadProduct.getText()) && !"".equals(txtPrecioProduct.getText())) {
+                pro.setCodigo(txtCodigoProduct.getText());
+                pro.setNombre(txtDescProduct.getText());
+                pro.setProveedor(cbxProveedorProduct.getSelectedItem().toString());
+                pro.setStock(Integer.parseInt(txtCantidadProduct.getText()));
+                pro.setPrecio(Double.parseDouble(txtPrecioProduct.getText()));
+                pro.setId(Integer.parseInt(txtIdPro.getText()));
+                proDAO.modificarProductos(pro);
+                JOptionPane.showMessageDialog(null, "Producto Modificado");
+                limpiarTable();
+                limpiarProductos();
+                listarProductos();
+            }
+        }
+    }//GEN-LAST:event_btnEditarProductoActionPerformed
+
+    private void cbxProveedorProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxProveedorProductActionPerformed
+        
+    }//GEN-LAST:event_cbxProveedorProductActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        limpiarTable();
+        listarProductos();
+        jTabbedPane1.setSelectedIndex(3);
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void btnEliminarproductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarproductActionPerformed
+        if (!"".equals(txtIdPro.getText())) {
+            int pregunta = JOptionPane.showConfirmDialog(null, "¿Estas seguro de eliminar?");
+            if (pregunta == 0) {
+                int id = Integer.parseInt(txtIdPro.getText());
+                proDAO.eliminarProductos(id);
+                limpiarTable();
+                limpiarProductos();
+                listarProductos();
+            }
+        }
+    }//GEN-LAST:event_btnEliminarproductActionPerformed
+
+    private void tableProductMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableProductMouseClicked
+        // TODO add your handling code here:
+        int fila = tableProduct.rowAtPoint(evt.getPoint());
+        txtIdPro.setText(tableProduct.getValueAt(fila, 0).toString());
+        txtCodigoProduct.setText(tableProduct.getValueAt(fila, 1).toString());
+        txtDescProduct.setText(tableProduct.getValueAt(fila, 2).toString());
+        cbxProveedorProduct.setSelectedItem(tableProduct.getValueAt(fila, 3).toString());
+        txtCantidadProduct.setText(tableProduct.getValueAt(fila, 4).toString());
+        txtPrecioProduct.setText(tableProduct.getValueAt(fila, 5).toString());
+    }//GEN-LAST:event_tableProductMouseClicked
+
+    private void btnNuevoProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoProductActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnNuevoProductActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1482,4 +1592,14 @@ public class Sistema extends javax.swing.JFrame {
         txtDireccionProveedor.setText("");
         txtRazonProveedor.setText("");
     }
+    
+    private void limpiarProductos() {
+        txtIdPro.setText("");
+        txtCodigoProduct.setText("");
+        cbxProveedorProduct.setSelectedItem(null);
+        txtDescProduct.setText("");
+        txtCantidadProduct.setText("");
+        txtPrecioProduct.setText("");
+    }
+    
 }
