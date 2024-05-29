@@ -6,6 +6,8 @@ package View;
 
 import Model.Cliente;
 import Model.ClienteDAO;
+import Model.Productos;
+import Model.ProductosDAO;
 import Model.Proveedor;
 import Model.ProveedorDAO;
 import java.util.List;
@@ -20,6 +22,8 @@ public class Sistema extends javax.swing.JFrame {
 
     Cliente cl = new Cliente();
     ClienteDAO client = new ClienteDAO();
+    Productos pro = new Productos();
+    ProductosDAO proDAO = new ProductosDAO();
     Proveedor pr = new Proveedor();
     ProveedorDAO prDAO = new ProveedorDAO();
     DefaultTableModel modelo = new DefaultTableModel();
@@ -655,6 +659,11 @@ public class Sistema extends javax.swing.JFrame {
 
         btnEditarProveedor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/Actualizar (2).png"))); // NOI18N
         btnEditarProveedor.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditarProveedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarProveedorActionPerformed(evt);
+            }
+        });
 
         btnEliminarProveedor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/eliminar.png"))); // NOI18N
         btnEliminarProveedor.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -800,6 +809,11 @@ public class Sistema extends javax.swing.JFrame {
 
         btnGuardarProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/GuardarTodo.png"))); // NOI18N
         btnGuardarProducto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGuardarProducto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarProductoActionPerformed(evt);
+            }
+        });
 
         btnEditarProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/Actualizar (2).png"))); // NOI18N
         btnEditarProducto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -1255,7 +1269,57 @@ public class Sistema extends javax.swing.JFrame {
 
     private void btnNuevoProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoProveedorActionPerformed
         // TODO add your handling code here:
+        limpiarProveedor();
     }//GEN-LAST:event_btnNuevoProveedorActionPerformed
+
+    private void btnEditarProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarProveedorActionPerformed
+        // TODO add your handling code here:
+        if ("".equals(txtIdProveedor.getText())) {
+            JOptionPane.showMessageDialog(null, "Seleccione una fila");
+        } else {
+
+            if (!"".equals(txtNitProveedor.getText()) && !"".equals(txtNombreProveedor.getText())
+                    && !"".equals(txtTelefonoProveedor.getText()) && !"".equals(txtDireccionProveedor.getText())) {
+                pr.setNit(Integer.parseInt(txtNitProveedor.getText()));
+                pr.setNombre(txtNombreProveedor.getText());
+                pr.setTelefono(Long.parseLong(txtTelefonoProveedor.getText()));
+                pr.setDireccion(txtDireccionProveedor.getText());
+                pr.setRazon(txtRazonProveedor.getText());
+                pr.setId(Integer.parseInt(txtIdProveedor.getText()));
+                if (prDAO.ModificarProveedor(pr)) {
+                    limpiarTable();
+                    limpiarProveedor();
+                    listarProveedor();
+                    
+                    JOptionPane.showMessageDialog(null, "Proveedor editado");
+                }else {
+                    JOptionPane.showMessageDialog(null, "Error al editar el proveedor");
+                }
+                
+                
+            } else {
+                JOptionPane.showMessageDialog(null, "Faltan Datos");
+            }
+        }
+    }//GEN-LAST:event_btnEditarProveedorActionPerformed
+
+    private void btnGuardarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarProductoActionPerformed
+        // TODO add your handling code here:
+        
+        if (!"".equals(txtCodigoProduct.getText()) &&  !"".equals(txtDescProduct.getText()) &&  !"".equals(txtCantidadProduct.getText()) && !"".equals(cbxProveedorProduct.getSelectedItem()) && !"".equals(txtPrecioProduct.getText()) ) {
+            
+            pro.setCodigo(txtCodigoProduct.getText());
+            pro.setNombre(txtDescProduct.getText());
+            pro.setProveedor(cbxProveedorProduct.getSelectedItem().toString());
+            pro.setStock(Integer.parseInt(txtCantidadProduct.getText()));
+            pro.setPrecio(Double.parseDouble(txtPrecioProduct.getText()));
+            proDAO.RegistrarProductos(pro);
+            JOptionPane.showMessageDialog(null, "Productos Registrados");
+        } else { 
+            JOptionPane.showMessageDialog(null, "Los campos estan vacios");
+            
+        }
+    }//GEN-LAST:event_btnGuardarProductoActionPerformed
 
     /**
      * @param args the command line arguments
