@@ -28,6 +28,8 @@ public class Sistema extends javax.swing.JFrame {
     Proveedor pr = new Proveedor();
     ProveedorDAO prDAO = new ProveedorDAO();
     DefaultTableModel modelo = new DefaultTableModel();
+    int item;
+    double totalpagar = 0.00;
 
     public Sistema() {
         initComponents();
@@ -317,10 +319,26 @@ public class Sistema extends javax.swing.JFrame {
         jLabel6.setText("Stock Disponible");
 
         btnEliminarVenta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/eliminar.png"))); // NOI18N
+        btnEliminarVenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarVentaActionPerformed(evt);
+            }
+        });
 
         txtCodigoVenta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCodigoVentaActionPerformed(evt);
+            }
+        });
+        txtCodigoVenta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtCodigoVentaKeyPressed(evt);
+            }
+        });
+
+        txtCantidadVenta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtCantidadVentaKeyPressed(evt);
             }
         });
 
@@ -343,6 +361,12 @@ public class Sistema extends javax.swing.JFrame {
             tableVenta.getColumnModel().getColumn(4).setPreferredWidth(40);
         }
 
+        txtCcVenta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtCcVentaKeyPressed(evt);
+            }
+        });
+
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel7.setText("CC");
 
@@ -353,6 +377,11 @@ public class Sistema extends javax.swing.JFrame {
 
         btnGenerarVenta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/print.png"))); // NOI18N
         btnGenerarVenta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGenerarVenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerarVentaActionPerformed(evt);
+            }
+        });
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/money.png"))); // NOI18N
@@ -918,7 +947,7 @@ public class Sistema extends javax.swing.JFrame {
                             .addComponent(jLabel23)
                             .addComponent(jLabel25)
                             .addComponent(btnGuardarProducto))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addComponent(btnEditarProducto)
@@ -1431,6 +1460,133 @@ public class Sistema extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnNuevoProductActionPerformed
 
+    private void txtCodigoVentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCodigoVentaKeyPressed
+        if (evt.getKeyCode() == keyEvent. ){
+            if(!"".equals(txtCodigoVenta.getText())){
+                pro = proDao.BuscarPro(cod);
+                if(pro.getNombre() != null){
+                  txtDescripcionVenta.setText(""+pro.getNombre());
+                  txtPrecioVenta.setText(""+pro.getPrecio());
+                  txtStockDisponible.setText(""+pro.getStock());
+                  txtCantidadVenta.requestFocus();
+                }else{
+                 LimpiarVenta();
+                 txtCodigoVenta.resquestFocus();
+                }
+                
+            }else{
+                JOptionpane.showMessageDialog(null, "ingrese el coigo del producto");
+                txtCodigoVenta.requestFocus();
+            }
+        }    
+    }//GEN-LAST:event_txtCodigoVentaKeyPressed
+
+    private void txtCantidadVentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCantidadVentaKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            if(!"".equals(txtCantidadVenta.getText())){
+                String cod = txtCodigoVenta.getText();
+                String descripcion = txtDescripcionVenta.getText();
+                int cant = integer.parseint(txtCantidadVenta.getText());
+                double precio = Double.parseDouble(txtPrecioVenta.getText());
+                double total = cant * precio;
+                int stock = integer.parseint(txtStockDisponible.getText());
+                
+                if(stock >=){
+                    item = item + 1;
+                    modelo = (DefaultTableModel) tableVenta.getModel();
+                    for (int i = 0; i < TableVenta.getRowCount(); i++) {
+                        if (TableVenta.getValueAt(i,1).equals(txtDescripcionVenta.getTex())){
+                            JOptionpane.showMessageDialog(null, "el producto ya esta registrado");
+                            return;
+                        }
+                        
+                    }
+                    Arraylist lista = new Arraylist();
+                    lista.add(item);
+                    lista.add(cod);
+                    lista.add(descripcion);
+                    lista.add(cant);
+                    lista.add(precio);
+                    lista.add(total);
+                    object o = new object[5];
+                    o[0] = lista.get(1);
+                    o[1] = lista.get(2);
+                    o[2] = lista.get(3);
+                    o[3] = lista.get(4);
+                    o[4] = lista.get(4);
+                    modelo.addRow(0);
+                    TableVenta.setModel(modelo);
+                    TotalPagar();
+                    LimpiarVenta();
+                    txtCodigoVenta.requestFocus();
+                    
+                    
+                }else{
+                    JOptionPane.showMessageDialog(null," stock no disponible");
+                }
+            }else{
+                JOptionPane.showMessageDialog(null," ingrese cantidad");
+                
+            }
+        }
+    }                                           
+
+    private void btnEliminarVentaActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+       modelo = TableVenta.getModel();
+       modelo.removeRow(TableVenta.getSelectedRow);
+       TotalPagar();
+       txtCodigoVenta.requestFocus();
+    }                                                
+
+    private void txtCcVentaKeyPressed(java.awt.event.KeyEvent evt) {                                      
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if ("".equals(txtRucVenta.getText())) {
+               int dni = Integer.parseInt(txtRucVenta.getText());
+               cl = client.BuscarCliente(dni); 
+                if (cl.getNombre() != null) {
+                    txtNombreClienteVenta.setText("" + cl.getNombre());
+                    txtTelefonoCV.setText(("" + cl.getTelefono()));
+                    txtDireccionCV.setText("" + cl.getDireccion());
+                    txtRazonCV.setText("" + cl.getRazon());
+                }else{
+                    txtRucVenta.setText("");
+                    JOptionPane.showMessageDialog(null , "el cliente no existe ");
+                }
+            }
+            
+        }
+    }//GEN-LAST:event_txtCantidadVentaKeyPressed
+
+    private void btnEliminarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarVentaActionPerformed
+         modelo = TableVenta.getModel();
+       modelo.removeRow(TableVenta.getSelectedRow);
+       TotalPagar();
+       txtCodigoVenta.requestFocus();
+    }//GEN-LAST:event_btnEliminarVentaActionPerformed
+
+    private void txtCcVentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCcVentaKeyPressed
+          if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if ("".equals(txtRucVenta.getText())) {
+               int dni = Integer.parseInt(txtRucVenta.getText());
+               cl = client.BuscarCliente(dni); 
+                if (cl.getNombre() != null) {
+                    txtNombreClienteVenta.setText("" + cl.getNombre());
+                    txtTelefonoCV.setText(("" + cl.getTelefono()));
+                    txtDireccionCV.setText("" + cl.getDireccion());
+                    txtRazonCV.setText("" + cl.getRazon());
+                }else{
+                    txtRucVenta.setText("");
+                    JOptionPane.showMessageDialog(null , "el cliente no existe ");
+                }
+            }
+            
+        }
+    }//GEN-LAST:event_txtCcVentaKeyPressed
+
+    private void btnGenerarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarVentaActionPerformed
+        RegistrarVenta();
+    }//GEN-LAST:event_btnGenerarVentaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1600,6 +1756,34 @@ public class Sistema extends javax.swing.JFrame {
         txtDescProduct.setText("");
         txtCantidadProduct.setText("");
         txtPrecioProduct.setText("");
+    }
+
+    private void TotalPagar(){
+      Totalpagar = 0.00; 
+      int numFila = TableVenta.getRowCount();
+      for (int i = 0 ; numFila < 10 ; i++){
+          double cal = Double.parseDouble(String.valueOf(TableVenta.getModel().getValueAt(1,4)));
+          Totalpagar = Totalpagar + cal;
+          
+        }
+      LabelTotal.setText(String.format("%.2f", Totalpagar));
+    }
+    private void LimpiarVenta(){
+        txtCodigoVenta.setText("");
+        txtDescripcionVenta.setText("");
+        txtCantidadVenta.setText("");
+        txtStockDisponible.setText("");
+        txtPrecioVenta.setText("");
+        
+    }
+        private void RegistrarVenta(){
+        String cliente = txtNombreClienteVenta.getText();
+        String vendedor = LabelVendedor.getText();
+        double monto = TotalPagar;
+        v.setCliente(cliente);
+        v.setVendedor(vendedor);
+        v.setTotal(monto);
+        Vdao.registrarVenta(v);
     }
     
 }

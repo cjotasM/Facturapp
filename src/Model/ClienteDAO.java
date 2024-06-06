@@ -11,7 +11,28 @@ public class ClienteDAO {
     Connection con;
     PreparedStatement ps;
     ResultSet rs;
-
+        
+    public Cliente BuscarCliente(int dni){
+        Cliente cl = new Cliente();
+        String sql = "SELECT * FROM clientes WHERE dni = ? ";
+        try{
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, dni);
+            rs = ps.executeQuery();
+            if(rs.next()){
+                cl.setNombre(rs.getString("nombre"));
+                cl.setTelefono(rs.getInt("telefono"));
+                cl.setDireccion(rs.getString("direccion"));
+                cl.setRazon(rs.getString("razon"));
+            }
+        }catch (SQLException e){
+            System.out.println(e.toString());
+        }
+        return cl;
+                
+    }
+    
     public boolean registrarCliente(Cliente cl) {
         String sql = "INSERT INTO clientes (cc, nombre, telefono, direccion, razon) VALUES (?, ?, ?, ?, ?)";
 
