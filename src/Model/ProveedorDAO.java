@@ -57,12 +57,6 @@ public class ProveedorDAO {
             
         } catch (SQLException e) {
             System.out.println(e.toString());
-        }finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                System.out.println(ex.toString());
-            }
         }
         return listaPr;
     }
@@ -80,17 +74,11 @@ public class ProveedorDAO {
         } catch (SQLException e) {
             System.out.println(e.toString());
             return false;
-        }finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                System.out.println(ex.toString());
-            }
         }
     }
     
     public boolean ModificarProveedor(Proveedor pr) {
-        String sql = "UPDATE proveedores SET nit = ?, nombre = ?, telefono = ?, direccion = ?, razon = ? WHERE id = ?";
+        String sql = "UPDATE proveedores SET nit=?, nombre=?, telefono=?, direccion=?, razon=? WHERE id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
