@@ -60,6 +60,12 @@ public class ClienteDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.toString());
+        }finally {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+            }
         }
         return listaCl;
     }
@@ -102,15 +108,42 @@ public class ClienteDAO {
             return true;
         } catch (SQLException e) {
             System.out.println(e.toString());
-            System.out.println("aqui 1");
             return false;
         } finally {
             try {
                 con.close();
             } catch (SQLException e) {
-                System.out.println(e.toString());
-                System.out.println("aqui 2");
+                System.out.println(e.toString());                
             }
         }
+    }
+    
+    public Cliente buscarCliente(int cc){
+       Cliente cl = new Cliente();
+       
+       String sql = "SELECT * FROM clientes WHERE cc = ?";
+       
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, cc);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                cl.setNombre(rs.getString("nombre"));
+                cl.setTelefono(rs.getLong("telefono"));
+                cl.setDireccion(rs.getString("direccion"));
+                cl.setRazon(rs.getString("razon"));
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }finally {
+            try {
+                con.close();
+            } catch (SQLException e) {
+                System.out.println(e.toString());
+                
+            }
+        }
+        return cl;
     }
 }
