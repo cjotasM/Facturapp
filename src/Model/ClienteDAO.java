@@ -11,28 +11,7 @@ public class ClienteDAO {
     Connection con;
     PreparedStatement ps;
     ResultSet rs;
-        
-    public Cliente BuscarCliente(int dni){
-        Cliente cl = new Cliente();
-        String sql = "SELECT * FROM clientes WHERE dni = ? ";
-        try{
-            con = cn.getConnection();
-            ps = con.prepareStatement(sql);
-            ps.setInt(1, dni);
-            rs = ps.executeQuery();
-            if(rs.next()){
-                cl.setNombre(rs.getString("nombre"));
-                cl.setTelefono(rs.getInt("telefono"));
-                cl.setDireccion(rs.getString("direccion"));
-                cl.setRazon(rs.getString("razon"));
-            }
-        }catch (SQLException e){
-            System.out.println(e.toString());
-        }
-        return cl;
-                
-    }
-    
+
     public boolean registrarCliente(Cliente cl) {
         String sql = "INSERT INTO clientes (cc, nombre, telefono, direccion, razon) VALUES (?, ?, ?, ?, ?)";
 
@@ -81,6 +60,12 @@ public class ClienteDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.toString());
+        }finally {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+            }
         }
         return listaCl;
     }
@@ -123,15 +108,42 @@ public class ClienteDAO {
             return true;
         } catch (SQLException e) {
             System.out.println(e.toString());
-            System.out.println("aqui 1");
             return false;
         } finally {
             try {
                 con.close();
             } catch (SQLException e) {
-                System.out.println(e.toString());
-                System.out.println("aqui 2");
+                System.out.println(e.toString());                
             }
         }
+    }
+    
+    public Cliente buscarCliente(int cc){
+       Cliente cl = new Cliente();
+       
+       String sql = "SELECT * FROM clientes WHERE cc = ?";
+       
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, cc);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                cl.setNombre(rs.getString("nombre"));
+                cl.setTelefono(rs.getLong("telefono"));
+                cl.setDireccion(rs.getString("direccion"));
+                cl.setRazon(rs.getString("razon"));
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }finally {
+            try {
+                con.close();
+            } catch (SQLException e) {
+                System.out.println(e.toString());
+                
+            }
+        }
+        return cl;
     }
 }

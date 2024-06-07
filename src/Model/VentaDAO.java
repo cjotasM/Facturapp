@@ -1,9 +1,8 @@
-
 package Model;
 
 import java.sql.*;
 
-public class VentaDao {
+public class VentaDAO {
     Connection con;
     PreparedStatement ps;
     Conexion cn = new Conexion();
@@ -19,6 +18,12 @@ public class VentaDao {
             ps.execute();
         } catch (SQLException e) {
             System.out.println(e.toString());
+        }finally {
+            try {
+                con.close();
+            } catch (SQLException e) {
+                System.out.println(e.toString());                
+            }
         }
         return r;
     }

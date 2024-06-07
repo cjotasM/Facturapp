@@ -1,24 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package View;
 
-import Model.Cliente;
-import Model.ClienteDAO;
-import Model.Productos;
-import Model.ProductosDAO;
-import Model.Proveedor;
-import Model.ProveedorDAO;
-import java.util.List;
+import Model.*;
+import Reports.Excel;
+import java.awt.event.KeyEvent;
+import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-/**
- *
- * @author mares
- */
 public class Sistema extends javax.swing.JFrame {
 
     Cliente cl = new Cliente();
@@ -27,9 +16,11 @@ public class Sistema extends javax.swing.JFrame {
     ProductosDAO proDAO = new ProductosDAO();
     Proveedor pr = new Proveedor();
     ProveedorDAO prDAO = new ProveedorDAO();
+    Venta v = new Venta();
+    VentaDAO vDAO = new VentaDAO();
     DefaultTableModel modelo = new DefaultTableModel();
     int item;
-    double totalpagar = 0.00;
+    double totalPagar = 0.00;
 
     public Sistema() {
         initComponents();
@@ -110,6 +101,7 @@ public class Sistema extends javax.swing.JFrame {
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+        labelVendedor = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
@@ -260,6 +252,8 @@ public class Sistema extends javax.swing.JFrame {
         jButton6.setText("Config");
         jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
+        labelVendedor.setText("Qkas de Papas");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -277,11 +271,17 @@ public class Sistema extends javax.swing.JFrame {
                     .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(49, 49, 49)
+                .addComponent(labelVendedor)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(182, 182, 182)
+                .addGap(148, 148, 148)
+                .addComponent(labelVendedor)
+                .addGap(18, 18, 18)
                 .addComponent(jButton1)
                 .addGap(18, 18, 18)
                 .addComponent(jButton2)
@@ -925,6 +925,11 @@ public class Sistema extends javax.swing.JFrame {
 
         btnExcelProduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/excel.png"))); // NOI18N
         btnExcelProduct.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExcelProduct.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcelProductActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -947,7 +952,7 @@ public class Sistema extends javax.swing.JFrame {
                             .addComponent(jLabel23)
                             .addComponent(jLabel25)
                             .addComponent(btnGuardarProducto))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addComponent(btnEditarProducto)
@@ -1395,6 +1400,10 @@ public class Sistema extends javax.swing.JFrame {
             pro.setPrecio(Double.parseDouble(txtPrecioProduct.getText()));
             proDAO.RegistrarProductos(pro);
             JOptionPane.showMessageDialog(null, "Productos Registrados");
+            limpiarTable();
+            limpiarProductos();
+            listarProductos();
+            
         } else { 
             JOptionPane.showMessageDialog(null, "Los campos estan vacios");
             
@@ -1458,133 +1467,108 @@ public class Sistema extends javax.swing.JFrame {
 
     private void btnNuevoProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoProductActionPerformed
         // TODO add your handling code here:
+        limpiarProductos();
     }//GEN-LAST:event_btnNuevoProductActionPerformed
 
+    private void btnExcelProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelProductActionPerformed
+        // TODO add your handling code here:
+        Excel.reporte();
+    }//GEN-LAST:event_btnExcelProductActionPerformed
+
     private void txtCodigoVentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCodigoVentaKeyPressed
-        if (evt.getKeyCode() == keyEvent. ){
-            if(!"".equals(txtCodigoVenta.getText())){
-                pro = proDao.BuscarPro(cod);
-                if(pro.getNombre() != null){
-                  txtDescripcionVenta.setText(""+pro.getNombre());
-                  txtPrecioVenta.setText(""+pro.getPrecio());
-                  txtStockDisponible.setText(""+pro.getStock());
-                  txtCantidadVenta.requestFocus();
-                }else{
-                 LimpiarVenta();
-                 txtCodigoVenta.resquestFocus();
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!"".equals(txtCodigoVenta.getText())) {
+                String cod = txtCodigoVenta.getText();
+                pro = proDAO.buscarProducts(cod);
+                if (pro.getNombre() != null) {
+                    txtDescripcionVenta.setText("" + pro.getNombre());
+                    txtPrecioVenta.setText("" + pro.getPrecio());
+                    txtStockDisponible.setText("" + pro.getStock());
+                    txtCantidadVenta.requestFocus();
+                }else {
+                    limpiarVenta();
+                    txtCodigoVenta.requestFocus();
                 }
-                
-            }else{
-                JOptionpane.showMessageDialog(null, "ingrese el coigo del producto");
+            }else {
+                JOptionPane.showMessageDialog(null, "Ingrese el codigo del producto");
                 txtCodigoVenta.requestFocus();
             }
-        }    
+        }
     }//GEN-LAST:event_txtCodigoVentaKeyPressed
 
     private void txtCantidadVentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCantidadVentaKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
-            if(!"".equals(txtCantidadVenta.getText())){
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!"".equals(txtCantidadVenta.getText())) {
                 String cod = txtCodigoVenta.getText();
                 String descripcion = txtDescripcionVenta.getText();
-                int cant = integer.parseint(txtCantidadVenta.getText());
+                int cant = Integer.parseInt(txtCantidadVenta.getText());
                 double precio = Double.parseDouble(txtPrecioVenta.getText());
                 double total = cant * precio;
-                int stock = integer.parseint(txtStockDisponible.getText());
-                
-                if(stock >=){
+                int stock = Integer.parseInt(txtStockDisponible.getText());
+                if (stock >= cant) {
                     item = item + 1;
                     modelo = (DefaultTableModel) tableVenta.getModel();
-                    for (int i = 0; i < TableVenta.getRowCount(); i++) {
-                        if (TableVenta.getValueAt(i,1).equals(txtDescripcionVenta.getTex())){
-                            JOptionpane.showMessageDialog(null, "el producto ya esta registrado");
+                    for (int i = 0; i < tableVenta.getRowCount(); i++) {
+                        if (tableVenta.getValueAt(i, 1).equals(txtDescripcionVenta.getText())) {
+                            JOptionPane.showMessageDialog(null, "El producto ya está registrado");
                             return;
                         }
-                        
                     }
-                    Arraylist lista = new Arraylist();
+                    ArrayList lista = new ArrayList();
                     lista.add(item);
                     lista.add(cod);
                     lista.add(descripcion);
                     lista.add(cant);
                     lista.add(precio);
                     lista.add(total);
-                    object o = new object[5];
-                    o[0] = lista.get(1);
-                    o[1] = lista.get(2);
-                    o[2] = lista.get(3);
-                    o[3] = lista.get(4);
-                    o[4] = lista.get(4);
-                    modelo.addRow(0);
-                    TableVenta.setModel(modelo);
-                    TotalPagar();
-                    LimpiarVenta();
+                    
+                    Object[] O = new Object[5];
+                    O[0] = lista.get(1);
+                    O[1] = lista.get(2);
+                    O[2] = lista.get(3);
+                    O[3] = lista.get(4);
+                    O[4] = lista.get(5);
+                    modelo.addRow(O);
+                    tableVenta.setModel(modelo);
+                    totalPagar();
+                    limpiarVenta();
                     txtCodigoVenta.requestFocus();
-                    
-                    
-                }else{
-                    JOptionPane.showMessageDialog(null," stock no disponible");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No hay unidades disponibles");
                 }
-            }else{
-                JOptionPane.showMessageDialog(null," ingrese cantidad");
-                
+            }else {
+                JOptionPane.showMessageDialog(null, "Ingrese Cantidad");
             }
-        }
-    }                                           
-
-    private void btnEliminarVentaActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-       modelo = TableVenta.getModel();
-       modelo.removeRow(TableVenta.getSelectedRow);
-       TotalPagar();
-       txtCodigoVenta.requestFocus();
-    }                                                
-
-    private void txtCcVentaKeyPressed(java.awt.event.KeyEvent evt) {                                      
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if ("".equals(txtRucVenta.getText())) {
-               int dni = Integer.parseInt(txtRucVenta.getText());
-               cl = client.BuscarCliente(dni); 
-                if (cl.getNombre() != null) {
-                    txtNombreClienteVenta.setText("" + cl.getNombre());
-                    txtTelefonoCV.setText(("" + cl.getTelefono()));
-                    txtDireccionCV.setText("" + cl.getDireccion());
-                    txtRazonCV.setText("" + cl.getRazon());
-                }else{
-                    txtRucVenta.setText("");
-                    JOptionPane.showMessageDialog(null , "el cliente no existe ");
-                }
-            }
-            
         }
     }//GEN-LAST:event_txtCantidadVentaKeyPressed
 
     private void btnEliminarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarVentaActionPerformed
-         modelo = TableVenta.getModel();
-       modelo.removeRow(TableVenta.getSelectedRow);
-       TotalPagar();
-       txtCodigoVenta.requestFocus();
+        modelo = (DefaultTableModel) tableVenta.getModel();
+        modelo.removeRow(tableVenta.getSelectedRow());
+        totalPagar();
+        txtCodigoVenta.requestFocus();
     }//GEN-LAST:event_btnEliminarVentaActionPerformed
 
     private void txtCcVentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCcVentaKeyPressed
-          if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if ("".equals(txtRucVenta.getText())) {
-               int dni = Integer.parseInt(txtRucVenta.getText());
-               cl = client.BuscarCliente(dni); 
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!"".equals(txtCcVenta.getText())) {
+                int cc = Integer.parseInt(txtCcVenta.getText());
+                cl = client.buscarCliente(cc);
                 if (cl.getNombre() != null) {
                     txtNombreClienteVenta.setText("" + cl.getNombre());
-                    txtTelefonoCV.setText(("" + cl.getTelefono()));
+                    txtTelefonoCV.setText("" + cl.getTelefono());
                     txtDireccionCV.setText("" + cl.getDireccion());
                     txtRazonCV.setText("" + cl.getRazon());
-                }else{
-                    txtRucVenta.setText("");
-                    JOptionPane.showMessageDialog(null , "el cliente no existe ");
+                } else {
+                    txtCcVenta.setText("");
+                    JOptionPane.showMessageDialog(null, "El cliente no existe");
                 }
             }
-            
         }
     }//GEN-LAST:event_txtCcVentaKeyPressed
 
     private void btnGenerarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarVentaActionPerformed
-        RegistrarVenta();
+        registrarVenta();
     }//GEN-LAST:event_btnGenerarVentaActionPerformed
 
     /**
@@ -1696,6 +1680,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField25;
     private javax.swing.JTextField jTextField26;
     private javax.swing.JLabel labelTotalPagar;
+    private javax.swing.JLabel labelVendedor;
     private javax.swing.JTable tableCliente;
     private javax.swing.JTable tableProduct;
     private javax.swing.JTable tableProveedor;
@@ -1757,18 +1742,18 @@ public class Sistema extends javax.swing.JFrame {
         txtCantidadProduct.setText("");
         txtPrecioProduct.setText("");
     }
-
-    private void TotalPagar(){
-      Totalpagar = 0.00; 
-      int numFila = TableVenta.getRowCount();
-      for (int i = 0 ; numFila < 10 ; i++){
-          double cal = Double.parseDouble(String.valueOf(TableVenta.getModel().getValueAt(1,4)));
-          Totalpagar = Totalpagar + cal;
-          
+    
+    private void totalPagar(){
+        totalPagar = 0.00;
+        int numFila = tableVenta.getRowCount();
+        for (int i = 0; i < numFila; i++) {
+            double cal = Double.parseDouble(String.valueOf(tableVenta.getModel().getValueAt(i, 4)));
+            totalPagar = totalPagar + cal;
         }
-      LabelTotal.setText(String.format("%.2f", Totalpagar));
+        labelTotalPagar.setText(String.format("%.2f", totalPagar));
     }
-    private void LimpiarVenta(){
+    
+    private void limpiarVenta() {
         txtCodigoVenta.setText("");
         txtDescripcionVenta.setText("");
         txtCantidadVenta.setText("");
@@ -1776,14 +1761,14 @@ public class Sistema extends javax.swing.JFrame {
         txtPrecioVenta.setText("");
         
     }
-        private void RegistrarVenta(){
+    
+    private void registrarVenta() {
         String cliente = txtNombreClienteVenta.getText();
-        String vendedor = LabelVendedor.getText();
-        double monto = TotalPagar;
+        String vendedor = labelVendedor.getText();
+        double monto = totalPagar;
         v.setCliente(cliente);
         v.setVendedor(vendedor);
         v.setTotal(monto);
-        Vdao.registrarVenta(v);
+        vDAO.registrarVenta(v);
     }
-    
 }
