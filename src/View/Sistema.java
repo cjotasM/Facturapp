@@ -1,8 +1,28 @@
 package View;
 
-import Model.*;
+import Model.Cliente;
+import Model.ClienteDAO;
+import Model.Detalle;
+import Model.Productos;
+import Model.ProductosDAO;
+import Model.Proveedor;
+import Model.ProveedorDAO;
+import Model.Venta;
+import Model.VentaDAO;
+
 import Reports.Excel;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -18,7 +38,9 @@ public class Sistema extends javax.swing.JFrame {
     ProveedorDAO prDAO = new ProveedorDAO();
     Venta v = new Venta();
     VentaDAO vDAO = new VentaDAO();
+    Detalle dv = new Detalle();
     DefaultTableModel modelo = new DefaultTableModel();
+    DefaultTableModel tmp = new DefaultTableModel();
     int item;
     double totalPagar = 0.00;
 
@@ -26,6 +48,9 @@ public class Sistema extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         txtIdCliente.setVisible(false);
+        txtIdventa.setVisible(false);
+        txtIdPro.setVisible(false);
+        txtIdProveedor.setVisible(false);
         AutoCompleteDecorator.decorate(cbxProveedorProduct);
         proDAO.ConsultarProveedor(cbxProveedorProduct);
     }
@@ -1167,7 +1192,7 @@ public class Sistema extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+         jTabbedPane1.setSelectedIndex(0);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void txtCodigoVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoVentaActionPerformed
@@ -1507,7 +1532,7 @@ public class Sistema extends javax.swing.JFrame {
                 int stock = Integer.parseInt(txtStockDisponible.getText());
                 if (stock >= cant) {
                     item = item + 1;
-                    modelo = (DefaultTableModel) tableVenta.getModel();
+                    tmp = (DefaultTableModel) tableVenta.getModel();
                     for (int i = 0; i < tableVenta.getRowCount(); i++) {
                         if (tableVenta.getValueAt(i, 1).equals(txtDescripcionVenta.getText())) {
                             JOptionPane.showMessageDialog(null, "El producto ya está registrado");
@@ -1528,8 +1553,8 @@ public class Sistema extends javax.swing.JFrame {
                     O[2] = lista.get(3);
                     O[3] = lista.get(4);
                     O[4] = lista.get(5);
-                    modelo.addRow(O);
-                    tableVenta.setModel(modelo);
+                    tmp.addRow(O);
+                    tableVenta.setModel(tmp);
                     totalPagar();
                     limpiarVenta();
                     txtCodigoVenta.requestFocus();
@@ -1569,6 +1594,10 @@ public class Sistema extends javax.swing.JFrame {
 
     private void btnGenerarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarVentaActionPerformed
         registrarVenta();
+        registrarDetalle();
+        actualizarStock();
+        limpiarTableVenta();
+        limpiarClienteVenta();
     }//GEN-LAST:event_btnGenerarVentaActionPerformed
 
     /**
@@ -1759,7 +1788,7 @@ public class Sistema extends javax.swing.JFrame {
         txtCantidadVenta.setText("");
         txtStockDisponible.setText("");
         txtPrecioVenta.setText("");
-        
+        txtIdventa.setText("");
     }
     
     private void registrarVenta() {
@@ -1770,5 +1799,83 @@ public class Sistema extends javax.swing.JFrame {
         v.setVendedor(vendedor);
         v.setTotal(monto);
         vDAO.registrarVenta(v);
+    }
+    
+    private void registrarDetalle(){
+        int id = vDAO.idVenta();
+        for (int i = 0; i < tableVenta.getRowCount(); i++) {
+            String cod = tableVenta.getValueAt(i, 0).toString();
+            int cant = Integer.parseInt(tableVenta.getValueAt(i, 2).toString());
+            double precio = Double.parseDouble(tableVenta.getValueAt(i, 3).toString());
+            
+            dv.setCod_pro(cod);
+            dv.setCantidad(cant);
+            dv.setPrecio(precio);
+            dv.setId(id);
+            vDAO.registrarDetalle(dv);
+        }
+    }
+    
+    private void actualizarStock(){
+        for (int i = 0; i < tableVenta.getRowCount(); i++) {
+            String cod = tableVenta.getValueAt(i, 0).toString();
+            int cant = Integer.parseInt(tableVenta.getValueAt(i, 2).toString());
+            pro = proDAO.buscarProducts(cod);
+            int stockActual= pro.getStock()-cant;
+            vDAO.actualizarStock(stockActual, cod);
+        }
+    }
+    
+    private void limpiarTableVenta() {
+        tmp = (DefaultTableModel) tableVenta.getModel();    
+        int fila = tableVenta.getRowCount();
+        
+        for (int i = 0; i < fila; i++) {
+            tmp.removeRow(0);
+        }
+    }
+
+    private void limpiarClienteVenta() {
+        txtCcVenta.setText("");
+        txtNombreClienteVenta.setText("");
+        txtTelefonoCV.setText("");
+        txtDireccionCV.setText("");
+        txtRazonCV.setText("");
+    }
+    
+    private void pdf(){
+        try {
+            FileOutputStream archivo;
+            File file = new File("scr/pdf/venta.pdf");
+            archivo = new FileOutputStream(file);
+            Document doc = new Document();
+            PdfWriter.getInstance(doc, archivo);
+            doc.open();
+            //se debe masterizar el logo para que quede bien en el archivo.
+            //Image img = Image.getInstance("src/img");
+            
+            Paragraph fecha = new Paragraph();
+            Font negrita = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD, BaseColor.BLUE);
+            fecha.add(Chunk.NEWLINE);
+            Date date = new Date();
+            fecha.add("Fecha: " + new SimpleDateFormat("dd-mm-yyyy").format(date) + "\n\n");
+            
+            PdfPTable encabezado = new PdfPTable(4);
+            encabezado.setWidthPercentage(100);
+            encabezado.getDefaultCell().setBorder(0);
+            float[] columnaEncabezado = new float[]{20f, 30f, 70f, 40f};
+            encabezado.setWidths(columnaEncabezado);
+            encabezado.setHorizontalAlignment(Element.ALIGN_LEFT);
+            
+            String nit = "125112", tel =" 1221122", dir = "cra 31 # 48A-21", ra = "Qkas de papas";
+            String nom = "Qkas de papas";
+            
+            encabezado.addCell("");
+            encabezado.addCell("Nit: " + nit);
+                    
+            doc.close();
+            archivo.close();
+        } catch (Exception e) {
+        }
     }
 }
