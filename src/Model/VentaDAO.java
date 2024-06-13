@@ -1,6 +1,8 @@
 package Model;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VentaDAO {
     Connection con;
@@ -16,7 +18,7 @@ public class VentaDAO {
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
-            ps.executeQuery();
+            rs = ps.executeQuery();
             if (rs.next()) {
                 id = rs.getInt(1);
             }
@@ -33,13 +35,14 @@ public class VentaDAO {
     }
     
     public int registrarVenta(Venta v){
-       String sql =  "INSERT INTO ventas (cliente,vendedor,total) VALUES(?,?,?)";
+       String sql =  "INSERT INTO ventas (cliente,vendedor,total,fecha) VALUES(?,?,?,?)";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
             ps.setString(1, v.getCliente());
             ps.setString(2, v.getVendedor());
             ps.setDouble(3, v.getTotal());
+            ps.setString(4, v.getFecha());
             ps.execute();
         } catch (SQLException e) {
             System.out.println(e.toString());
@@ -54,7 +57,7 @@ public class VentaDAO {
     }
     
     public int registrarDetalle(Detalle dv) {
-        String sql = "INSERT INTO detalle (cod_pro, cantidad, precio, id_venta) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO detalle (cod_pro, cantidad, precio, idVenta) VALUES (?,?,?,?)";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
@@ -100,5 +103,33 @@ public class VentaDAO {
             }
         }
         
+    }
+    
+    public List listarVentas() {
+        List<Venta> listaVenta = new ArrayList();
+        String sql = "SELECT * FROM ventas";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                Venta vent = new Venta();
+                vent.setId(rs.getInt("id"));
+                vent.setCliente(rs.getString("cliente"));
+                vent.setVendedor(rs.getString("vendedor"));
+                vent.setTotal(rs.getDouble("total"));
+                listaVenta.add(vent);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.toString());
+        }finally {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+            }
+        }
+        return listaVenta;
     }
 }

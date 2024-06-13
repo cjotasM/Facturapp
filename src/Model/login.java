@@ -3,15 +3,17 @@ package Model;
 public class login {
     private int id;
     private String nombre, correo, pass;
+    private String rol;
 
     public login() {
     }
 
-    public login(int id, String nombre, String correo, String pass) {
+    public login(int id, String nombre, String correo, String pass, String rol) {
         this.id = id;
         this.nombre = nombre;
         this.correo = correo;
         this.pass = pass;
+        this.rol = rol;
     }
 
     public int getId() {
@@ -45,6 +47,15 @@ public class login {
     public void setPass(String pass) {
         this.pass = pass;
     }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+    
     
     
 }

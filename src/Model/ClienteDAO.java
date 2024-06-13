@@ -73,6 +73,7 @@ public class ClienteDAO {
     public boolean eliminarCliente(int id) {
         String sql = "DELETE FROM clientes WHERE id = ?";
         try {
+            con = cn.getConnection();
             ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             ps.execute();
@@ -95,6 +96,7 @@ public class ClienteDAO {
     public boolean modificarCliente(Cliente cl) {
         String sql = "UPDATE clientes SET cc = ?, nombre = ?, telefono = ?, direccion = ?, razon = ? WHERE id = ?";
         try {
+            con = cn.getConnection();
             ps = con.prepareStatement(sql);
             ps.setInt(1, cl.getCc());
             ps.setString(2, cl.getNombre());
